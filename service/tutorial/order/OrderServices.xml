@@ -38,7 +38,7 @@
         </out-parameters>
         <actions>
             <entity-find entity-name="mantle.order.OrderHeader" list="ordersList">
-                <order-by field-name="placedDate"/>
+                <order-by field-name="- placedDate"/>
             </entity-find>
         </actions>
     </service>
