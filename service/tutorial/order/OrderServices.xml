@@ -5,29 +5,23 @@
 
     <!-- Order & Related Services -->
     <service verb="get" noun="FemalePersons" displayName="get the female person details">
-        <in-parameters>
-            <parameter name="gender" default-value="F"/>
-        </in-parameters>
         <out-parameters>
             <parameter name="personList" type="list" required="true"/>
         </out-parameters>
         <actions>
             <entity-find entity-name="mantle.party.Person" list="personList">
-                <econdition field-name="gender"/>
+                <econdition field-name="gender" value="F"/>
             </entity-find>
         </actions>
     </service>
 
     <service verb="get" noun="Persons" displayName="get the person details">
-        <in-parameters>
-            <parameter name="maritalStatusEnumId" default-value="MarsMarried"/>
-        </in-parameters>
         <out-parameters>
             <parameter name="personList" type="list" required="true"/>
         </out-parameters>
         <actions>
             <entity-find entity-name="mantle.party.Person" list="personList">
-                <econdition field-name="maritalStatusEnumId"/>
+                <econdition field-name="maritalStatusEnumId" value="MarsMarried"/>
             </entity-find>
         </actions>
     </service>
@@ -59,72 +53,49 @@
 
     <service verb="get" noun="OrderHeaders" displayName="get the grand_total details">
         <out-parameters>
-            <parameter name="orderCount" type="list" required="true"/>
+            <parameter name="ordersList" type="list" required="true"/>
         </out-parameters>
         <actions>
-            <set field="orderCount" from="[]"/>
             <entity-find entity-name="mantle.order.OrderHeader" list="ordersList">
+                <having-econditions>
+                    <econdition field-name="grandTotal" operator="greater" from="50"/>
+                </having-econditions>
             </entity-find>
-            <iterate list="ordersList" entry="orderInfo">
-                <if condition="orderInfo.grandTotal &gt; 50">
-                    <then>
-                        <set field="orderCount" from="orderCount+[orderId:orderInfo.orderId,orderName:orderInfo.orderName,
-                        placedDate:orderInfo.placedDate,statusId:orderInfo.statusId,currencyUomId:orderInfo.currencyUomId
-                       ,productStoreId:orderInfo.productStoreId,grandTotal:orderInfo.grandTotal ]"/>
-                    </then>
-                </if>
-            </iterate>
         </actions>
     </service>
 
-
     <service verb="get" noun="OrderItems" displayName="get the grand_total details">
-        <in-parameters>
-            <parameter name="orderId" default-value="100102"/>
-            <parameter name="orderPartSeqId" default-value="01"/>
-        </in-parameters>
         <out-parameters>
             <parameter name="orderItemList" type="list" required="true"/>
         </out-parameters>
         <actions>
             <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
-                <econdition field-name="orderId"/>
-                <econdition field-name="orderPartSeqId"/>
+                <econdition field-name="orderId" value="100102"/>
+                <econdition field-name="orderPartSeqId" value="01"/>
             </entity-find>
         </actions>
     </service>
 
     <service verb="get" noun="OrderParts" displayName="get the part_total details">
         <out-parameters>
-            <parameter name="entityCount" type="list" required="true"/>
+            <parameter name="ordersPartList" type="list" required="true"/>
         </out-parameters>
         <actions>
-            <set field="entityCount" from="[]"/>
             <entity-find entity-name="mantle.order.OrderPart" list="ordersPartList">
+                <having-econditions>
+                    <econdition field-name="partTotal" operator="less" from="20"/>
+                </having-econditions>
             </entity-find>
-            <iterate list="ordersPartList" entry="entityInfo">
-                <if condition="entityInfo.partTotal &lt; 20">
-                    <then>
-                        <set field="entityCount" from="entityCount+[orderId:entityInfo.orderId
-                        ,orderPartSeqId:entityInfo.orderPartSeqId,partName:entityInfo.partName,statusId:entityInfo.statusId
-                        ,vendorPartyId:entityInfo.vendorPartyId,customerPartyId:entityInfo.customerPartyId
-                        ,facilityId:entityInfo.facilityId,partTotal:entityInfo.partTotal]"/>
-                    </then>
-                </if>
-            </iterate>
         </actions>
     </service>
 
     <service verb="get" noun="OrderPartData" displayName="get the order part details">
-        <in-parameters>
-            <parameter name="facilityId" default-value="ZIRET_WH"/>
-        </in-parameters>
         <out-parameters>
             <parameter name="orderPartLists" type="list" required="true"/>
         </out-parameters>
         <actions>
             <entity-find entity-name="mantle.order.OrderPart" list="ordersPartList">
-                <econdition field-name="facilityId"/>
+                <econdition field-name="facilityId" value="ZIRET_WH"/>
             </entity-find>
             <set field="orderPartLists" from="[orderId:ordersPartList.orderId
                         ,orderPartSeqId:ordersPartList.orderPartSeqId,partName:ordersPartList.partName
@@ -133,31 +104,24 @@
     </service>
 
     <service verb="get" noun="OrderPartsCount" displayName="get the order part count details">
-        <in-parameters>
-            <parameter name="customerPartyId" default-value="CustJqp"/>
-        </in-parameters>
         <out-parameters>
             <parameter name="orderPartSeqId" type="list" required="true"/>
         </out-parameters>
         <actions>
             <entity-find-count entity-name="mantle.order.OrderPart" count-field="orderPartSeqId">
-                <econdition field-name="customerPartyId"/>
+                <econdition field-name="customerPartyId" value="CustJqp"/>
             </entity-find-count>
         </actions>
     </service>
 
     <service verb="get" noun="OrderPartsInfo" displayName="get the order part details">
-        <in-parameters>
-            <parameter name="shipmentMethodEnumId" default-value="ShtMthGround"/>
-            <parameter name="facilityId" default-value="ZIRET_WH"/>
-        </in-parameters>
         <out-parameters>
             <parameter name="orderPartList" type="list" required="true"/>
         </out-parameters>
         <actions>
-            <entity-find entity-name="mantle.order.OrderPart" list="orderPartList">
-                <econdition field-name="shipmentMethodEnumId"/>
-                <econdition field-name="facilityId"/>
+            <entity-find entity-name="mantle.order.OrderPart" distinct="true" list="orderPartList">
+                <econdition field-name="shipmentMethodEnumId" value="ShtMthGround"/>
+                <econdition field-name="facilityId" value="ZIRET_WH"/>
             </entity-find>
         </actions>
     </service>
