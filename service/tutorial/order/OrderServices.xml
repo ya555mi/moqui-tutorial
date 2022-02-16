@@ -91,15 +91,17 @@
 
     <service verb="get" noun="OrderPartData" displayName="get the order part details">
         <out-parameters>
-            <parameter name="orderPartLists" type="list" required="true"/>
+            <parameter name="ordersPartList" type="list" required="true"/>
         </out-parameters>
         <actions>
             <entity-find entity-name="mantle.order.OrderPart" list="ordersPartList">
                 <econdition field-name="facilityId" value="ZIRET_WH"/>
+                <select-field field-name="orderId"/>
+                <select-field field-name="orderPartSeqId"/>
+                <select-field field-name="facilityId"/>
+                <select-field field-name="partName"/>
+                <select-field field-name="customerPartyId"/>
             </entity-find>
-            <set field="orderPartLists" from="[orderId:ordersPartList.orderId
-                        ,orderPartSeqId:ordersPartList.orderPartSeqId,partName:ordersPartList.partName
-                        ,customerPartyId:ordersPartList.customerPartyId,facilityId:ordersPartList.facilityId]"/>
         </actions>
     </service>
 
