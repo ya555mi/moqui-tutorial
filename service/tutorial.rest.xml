@@ -18,5 +18,6 @@
     <resource name="items">
         <method type="post"><service name="tutorial.order.OrderServices.create#CreateOrderPart"/></method>
     </resource>
+
 </resource>
 
