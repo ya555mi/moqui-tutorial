@@ -5,7 +5,7 @@
 <resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns="file:///home/yamini/sand-box/moqui-framework/framework/xsd/rest-api-2.1.xsd"
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-2.1.xsd"
-          name="tutorial" displayName="Moqui-tutorial REST API" version="2.0.0" require-authentication="anonymous-all">
+          name="order" displayName="Moqui-tutorial REST API" version="2.0.0" require-authentication="anonymous-all">
 
     <resource name="orders">
         <method type="post"><service name="tutorial.order.OrderServices.create#CreateOrder"/></method>
