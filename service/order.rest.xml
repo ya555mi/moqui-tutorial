@@ -11,11 +11,11 @@
         <id name="orderId">
             <method type="get"><service name="tutorial.order.OrderServices.get#OrderDisplayInfo"/></method>
             <method type="put"><service name="tutorial.order.OrderServices.store#OrderHeader"/></method>
+            <resource name="items">
+                <method type="post"><service name="tutorial.order.OrderServices.create#OrderPart"/></method>
+            </resource>
         </id>
         <method type="get"><service name="tutorial.order.OrderServices.get#OrderDetails"/></method>
-    </resource>
-    <resource name="items">
-        <method type="post"><service name="tutorial.order.OrderServices.create#OrderPart"/></method>
     </resource>
 </resource>
 
