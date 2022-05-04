@@ -4,170 +4,41 @@
           xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
     <!-- Order & Related Services -->
-    <service verb="get" noun="FemalePersons" displayName="get the female person details">
-        <out-parameters>
-            <parameter name="personList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.party.Person" list="personList">
-                <econdition field-name="gender" value="F"/>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="Persons" displayName="get the person details">
-        <out-parameters>
-            <parameter name="personList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.party.Person" list="personList">
-                <econdition field-name="maritalStatusEnumId" value="MarsMarried"/>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="LatestOrders" displayName="get the Latest order">
-        <out-parameters>
-            <parameter name="ordersList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.order.OrderHeader" list="ordersList">
-                <order-by field-name="- placedDate"/>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="Order" displayName="get the person details">
-        <in-parameters>
-            <parameter name="orderId" required="true"/>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="ordersList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="ordersList">
-                <field-map field-name="orderId"/>
-            </entity-find-one>
-        </actions>
-    </service>
-
-    <service verb="get" noun="OrderHeaders" displayName="get the grand_total details">
-        <out-parameters>
-            <parameter name="ordersList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.order.OrderHeader" list="ordersList">
-                <having-econditions>
-                    <econdition field-name="grandTotal" operator="greater" from="50"/>
-                </having-econditions>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="OrderItems" displayName="get the grand_total details">
-        <out-parameters>
-            <parameter name="orderItemList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
-                <econdition field-name="orderId" value="100102"/>
-                <econdition field-name="orderPartSeqId" value="01"/>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="OrderParts" displayName="get the part_total details">
-        <out-parameters>
-            <parameter name="ordersPartList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.order.OrderPart" list="ordersPartList">
-                <having-econditions>
-                    <econdition field-name="partTotal" operator="less" from="20"/>
-                </having-econditions>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="OrderPartData" displayName="get the order part details">
-        <out-parameters>
-            <parameter name="ordersPartList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.order.OrderPart" list="ordersPartList">
-                <econdition field-name="facilityId" value="ZIRET_WH"/>
-                <select-field field-name="orderId"/>
-                <select-field field-name="orderPartSeqId"/>
-                <select-field field-name="facilityId"/>
-                <select-field field-name="partName"/>
-                <select-field field-name="customerPartyId"/>
-            </entity-find>
-        </actions>
-    </service>
-
-    <service verb="get" noun="OrderPartsCount" displayName="get the order part count details">
-        <out-parameters>
-            <parameter name="orderPartSeqId" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find-count entity-name="mantle.order.OrderPart" count-field="orderPartSeqId">
-                <econdition field-name="customerPartyId" value="CustJqp"/>
-            </entity-find-count>
-        </actions>
-    </service>
-
-    <service verb="get" noun="OrderPartsInfo" displayName="get the order part details">
-        <out-parameters>
-            <parameter name="orderPartList" type="list" required="true"/>
-        </out-parameters>
-        <actions>
-            <entity-find entity-name="mantle.order.OrderPart" distinct="true" list="orderPartList">
-                <econdition field-name="shipmentMethodEnumId" value="ShtMthGround"/>
-                <econdition field-name="facilityId" value="ZIRET_WH"/>
-            </entity-find>
-        </actions>
-    </service>
-
-
-    <service verb="create" noun="CreateOrder" displayName="Create the order">
+    <service verb="create" noun="Order" displayName="Create the order">
         <in-parameters>
             <parameter name="orderName" required="true"/>
-            <parameter name="currencyUomId" required="true"/>
-            <parameter name="salesChannelEnumId" required="true"/>
-            <parameter name="statusId" required="true"/>
-            <parameter name="productStoreId" required="true"/>
+            <parameter name="currencyUomId" default-value="USD"/>
+            <parameter name="salesChannelEnumId"/>
+            <parameter name="statusId" default-value="OrderPlaced"/>
+            <parameter name="productStoreId"/>
             <parameter name="placedDate" required="true"/>
-            <parameter name="approvedDate" required="true"/>
+            <parameter name="approvedDate"/>
         </in-parameters>
         <out-parameters>
             <parameter name="orderId" required="true"/>
         </out-parameters>
         <actions>
-            <entity-find entity-name="mantle.party.Party" list="orderCreateList">
-                <econdition field-name="partyId" value="CustJqp"/>
-            </entity-find>
-            <if condition="orderCreateList">
-                <then>
-                    <service-call name="create#mantle.order.OrderHeader" in-map="context" out-map="context"/>
-                </then>
-            </if>
+            <!--Create Order in the OrderHeader entity-->
+            <service-call name="create#mantle.order.OrderHeader" in-map="context" out-map="context"/>
         </actions>
     </service>
 
 
-    <service verb="create" noun="CreateOrderPart" displayName="Create the order Part">
+    <service verb="create" noun="OrderPart" displayName="Create the order Part">
+        <description>Create an Order items (OrderPart and OrderItem).</description>
         <in-parameters>
             <parameter name="orderId" required="true"/>
-            <parameter name="partName" required="true"/>
+            <parameter name="partName"/>
             <parameter name="facilityId" required="true"/>
-            <parameter name="shipmentMethodEnumId" required="true"/>
+            <parameter name="shipmentMethodEnumId" default-value="ShMthGround"/>
             <parameter name="customerPartyId" required="true"/>
-            <parameter name="item_details" type="List">
+            <parameter name="item_details" type="List" required="true">
                 <parameter name="orderEntry" type="Map">
-                    <parameter name="productId"/>
+                    <parameter name="productId" required="true"/>
                     <parameter name="itemDescription"/>
-                    <parameter name="quantity"/>
-                    <parameter name="unitAmount"/>
+                    <parameter name="quantity" required="true"/>
+                    <parameter name="unitAmount" required="true"/>
+                    <parameter name="orderPartSeqId"/>
                 </parameter>
             </parameter>
         </in-parameters>
@@ -176,41 +47,47 @@
             <parameter name="orderPartSeqId" required="true"/>
         </out-parameters>
         <actions>
-            <entity-find entity-name="mantle.order.OrderHeader" list="orderCreateList">
+            <!-- Finding existing  orderId in the OrderHeader entity -->
+            <entity-find-count entity-name="mantle.order.OrderHeader" count-field="orderCount">
                 <econdition field-name="orderId"/>
-            </entity-find>
-            <if condition="orderCreateList">
-                <service-call name="create#mantle.order.OrderPart" in-map="context" out-map="context"/>
-            </if>
-            <entity-find entity-name="mantle.order.OrderPart" list="orderList">
-                <econdition field-name="orderId"/>
-                <econdition field-name="customerPartyId"/>
-            </entity-find>
-            <set field="productId" from="item_details.productId"/>
-            <set field="unitAmount" from="item_details.unitAmount"/>
-            <entity-find entity-name="mantle.product.Product" list="productList">
-                <econdition field-name="productId"/>
-            </entity-find>
-            <iterate list="productList" entry="product">
-                <set field="productId" from="product.productId"/>
-            </iterate>
-            <iterate list="orderList" entry="order">
-                <set field="orderId" from="order.orderId"/>
-            </iterate>
-            <if condition="orderList &amp;&amp; productList">
+            </entity-find-count>
+            <!-- If orderId exist then create order part in the OrderPart entity -->
+            <if condition="orderCount==1">
                 <then>
-                    <service-call name="create#mantle.order.OrderItem"
-                                  in-map="context+[orderId:orderId,productId:productId,
-                                  itemDescription:item_details.itemDescription,
-                                  unitAmount:unitAmount,quantity:quantity]"
-                                  out-map="context"/>
+                    <service-call name="create#mantle.order.OrderPart" in-map="context" out-map="context"/>
                 </then>
+                <else>
+                    <!-- If orderId doesn't exist then return an error -->
+                    <return error="true" message="OrderId doesn't exists in the OrderHeader entity [${orderId}]."/>
+                </else>
             </if>
+            <set field="orderPartSeqId" from="context.orderPartSeqId"/>
+            <iterate list="item_details" entry="item">
+                <set field="productId" from="item.productId"/>
+                <!-- Finding existing productId in the Product entity -->
+                <entity-find-one entity-name="mantle.product.Product" value-field="product">
+                    <field-map field-name="productId"/>
+                </entity-find-one>
+                <!-- If productId exist then create order items in the OrderItem entity -->
+                <if condition="product">
+                    <then>
+                        <service-call name="create#mantle.order.OrderItem" in-map="[orderId:orderId, orderPartSeqId:orderPartSeqId, productId:item.productId,
+                                  itemDescription:item.itemDescription,
+                                  unitAmount:item.unitAmount, quantity:item.quantity]"
+                                      out-map="context"/>
+                    </then>
+                    <else>
+                        <!-- If productId doesn't exist then return an error -->
+                        <return error="true"
+                                message="productId doesn't exists in the Product entity [${productId}]."/>
+                    </else>
+                </if>
+            </iterate>
         </actions>
     </service>
 
 
-    <service verb="store" noun="UpdateOrder" displayName="Update the order">
+    <service verb="store" noun="OrderHeader" displayName="Update the order">
         <in-parameters>
             <parameter name="orderId" required="true"/>
             <parameter name="orderName"/>
@@ -234,9 +111,11 @@
             <parameter name="grandTotal" required="true"/>
         </out-parameters>
         <actions>
-            <entity-find entity-name="mantle.order.OrderHeader" list="orderUpdateList">
-                <econdition field-name="orderId"/>
-            </entity-find>
+            <!-- Finding given orderId in the OrderHeader entity -->
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderUpdateList">
+                <field-map field-name="orderId"/>
+            </entity-find-one>
+            <!-- If orderId exist then update the Order in the order OrderHeader entity -->
             <if condition="orderUpdateList">
                 <then>
                     <service-call name="update#mantle.order.OrderHeader" in-map="context" out-map="context"/>
@@ -247,16 +126,20 @@
 
 
     <service verb="get" noun="OrderDisplayInfo">
+        <description>The OrderDisplayInfo service should return information about an order by giving its order id.
+        </description>
         <in-parameters>
             <parameter name="orderId" required="true"/>
         </in-parameters>
         <out-parameters>
             <parameter name="orders" type="list">
-                <parameter name="orderId" required="false"/>
-                <parameter name="orderName" required="false"/>
-                <parameter name="currencyUomId" required="false"/>
-                <parameter name="placedDate" required="true"/>
-                <parameter name="grandTotal" required="false"/>
+                <parameter name="orderId"/>
+                <parameter name="orderName"/>
+                <parameter name="currencyUomId"/>
+                <parameter name="salesChannelEnumId"/>
+                <parameter name="statusId"/>
+                <parameter name="placedDate"/>
+                <parameter name="grandTotal"/>
                 <parameter name="customers_deatails" type="map">
                     <parameter name="partyId"/>
                     <parameter name="firstName"/>
@@ -280,7 +163,6 @@
                                 <parameter name="unitAmount"/>
                             </parameter>
                         </parameter>
-
                     </parameter>
                 </parameter>
             </parameter>
@@ -290,80 +172,65 @@
             <set field="orders" from="[]"/>
             <set field="order_parts" from="[]"/>
             <set field="item_details" from="[]"/>
-            <entity-find entity-name="mantle.order.OrderHeader" list="orderList">
-                <econdition field-name="orderId"/>
-                <select-field field-name="orderId"/>
-                <select-field field-name="orderName"/>
-                <select-field field-name="currencyUomId"/>
-                <select-field field-name="placedDate"/>
-                <select-field field-name="grandTotal"/>
-            </entity-find>
+            <!-- Finding given orderId in the OrderHeader entity -->
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderList">
+                <field-map field-name="orderId"/>
+                <select-field
+                        field-name="orderId,orderName,currencyUomId,salesChannelEnumId,statusId,placedDate,grandTotal"/>
+            </entity-find-one>
+            <!-- If orderId exist in the OrderHeader entity then set the field with the help of orderList -->
+            <set field="orderId" from="orderList.orderId"/>
+            <set field="orderName" from="orderList.orderName"/>
+            <set field="currencyUomId" from="orderList.currencyUomId"/>
+            <set field="salesChannelEnumId" from="orderList.salesChannelEnumId"/>
+            <set field="statusId" from="orderList.statusId"/>
+            <set field="placedDate" from="orderList.placedDate"/>
+            <set field="grandTotal" from="orderList.grandTotal"/>
+            <!-- Finding the orderId in the OrderPart entity -->
             <entity-find entity-name="mantle.order.OrderPart" list="orderPartList">
                 <econdition field-name="orderId"/>
-                <select-field field-name="orderPartSeqId"/>
-                <select-field field-name="customerPartyId"/>
-                <select-field field-name="partName"/>
-                <select-field field-name="facilityId"/>
-                <select-field field-name="shipmentMethodEnumId"/>
-                <select-field field-name="statusId"/>
-                <select-field field-name="partTotal"/>
+                <select-field
+                        field-name="orderId,orderPartSeqId,customerPartyId,partName,facilityId,shipmentMethodEnumId,statusId,partTotal"/>
             </entity-find>
-            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
-                <econdition field-name="orderId"/>
-                <select-field field-name="orderItemSeqId"/>
-                <select-field field-name="productId"/>
-                <select-field field-name="itemDescription"/>
-                <select-field field-name="quantity"/>
-                <select-field field-name="unitAmount"/>
-            </entity-find>
-            <set field="partyId" from="orderPartList.customerPartyId"/>
-            <entity-find entity-name="mantle.party.Person" list="personList">
-                <econdition field-name="partyId"/>
-                <select-field field-name="partyId"/>
-                <select-field field-name="firstName"/>
-                <select-field field-name="middleName"/>
-                <select-field field-name="lastName"/>
-            </entity-find>
-            <iterate list="personList" entry="person">
-                <set field="partyId" from="person.partyId"/>
-                <set field="firstName" from="person.firstName"/>
-                <set field="middleName" from="person.middleName"/>
-                <set field="lastName" from="person.lastName"/>
-            </iterate>
+            <!-- Finding the partyId in the Person entity -->
+            <entity-find-one entity-name="mantle.party.Person" value-field="personMap">
+                <field-map field-name="partyId" from="orderPartList.first.customerPartyId"/>
+                <select-field field-name="partyId,firstName,middleName,lastName"/>
+            </entity-find-one>
+            <set field="partyId" from="personMap.partyId"/>
+            <set field="firstName" from="personMap.firstName"/>
+            <set field="middleName" from="personMap.middleName"/>
+            <set field="lastName" from="personMap.lastName"/>
+            <!-- Adding the person details in the customers_deatails map -->
+            <set field="customers_deatails"
+                 from="[partyId:partyId, firstName:firstName, middleName:middleName, lastName:lastName]"/>
+            <!-- Iterate orderPartList for getting orderPart details -->
             <iterate list="orderPartList" entry="orderPart">
-                <set field="orderPartSeqId" from="orderPart.orderPartSeqId"/>
-                <set field="partName" from="orderPart.partName"/>
-                <set field="facilityId" from="orderPart.facilityId"/>
-                <set field="shipmentMethodEnumId" from="orderPart.shipmentMethodEnumId"/>
-                <set field="statusId" from="orderPart.statusId"/>
-                <set field="partTotal" from="orderPart.partTotal"/>
+                <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
+                    <econdition field-name="orderId" from="orderPart.orderId"/>
+                    <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+                    <select-field field-name="orderItemSeqId,productId,itemDescription,quantity,unitAmount"/>
+                </entity-find>
+                <!-- Iterate orderItemList for getting orderItem details -->
+                <iterate list="orderItemList" entry="items">
+                    <set field="orderItemSeqId" from="items.orderItemSeqId"/>
+                    <set field="productId" from="items.productId"/>
+                    <set field="itemDescription" from="items.itemDescription"/>
+                    <set field="quantity" from="items.quantity"/>
+                    <set field="unitAmount" from="items.unitAmount"/>
+                    <!-- Set OrderItems details in the item_details list -->
+                    <set field="item_details" from="item_details+[orderItemSeqId:orderItemSeqId, productId:productId,
+                                itemDescription:itemDescription, quantity:quantity, unitAmount:unitAmount]"/>
+                </iterate>
+                <!-- Set OrderPart details in the Order_parts list and also adding the item_details map in the Order_parts list -->
+                <set field="order_parts" from="order_parts+[orderPartSeqId:orderPart.orderPartSeqId, partName:orderPart.partName,
+                                facilityId:orderPart.facilityId, shipmentMethodEnumId:orderPart.shipmentMethodEnumId,
+                                statusId:orderPart.statusId, partTotal:orderPart.partTotal, item_details:item_details]"/>
             </iterate>
-            <iterate list="orderList" entry="ordersmap">
-                <set field="orderId" from="ordersmap.orderId"/>
-                <set field="orderName" from="ordersmap.orderName"/>
-                <set field="currencyUomId" from="ordersmap.currencyUomId"/>
-                <set field="placedDate" from="ordersmap.placedDate"/>
-                <set field="grandTotal" from="ordersmap.grandTotal"/>
-            </iterate>
-            <iterate list="orderItemList" entry="orderItems">
-                <set field="orderItemSeqId" from="orderItems.orderItemSeqId"/>
-                <set field="productId" from="orderItems.productId"/>
-                <set field="itemDescription" from="orderItems.itemDescription"/>
-                <set field="quantity" from="orderItems.quantity"/>
-                <set field="unitAmount" from="orderItems.unitAmount"/>
-                <set field="item_details" from="item_details+[orderItemSeqId:orderItemSeqId,productId:productId,
-                        itemDescription:itemDescription,quantity:quantity,
-                        unitAmount:unitAmount]"/>
-            </iterate>
-            <set field="customers_deatails" from="customers_deatails+[partyId:partyId,firstName:firstName,
-                    middleName:middleName,lastName:lastName]"/>
-
-            <set field="order_parts" from="order_parts+[orderPartSeqId:orderPartSeqId,partName:partName,
-                    facilityId:facilityId,shipmentMethodEnumId:shipmentMethodEnumId,
-                    statusId:statusId,partTotal:partTotal,item_details:item_details]"/>
-            <set field="orders" from="orders+[orderId:orderId,orderName:orderName,currencyUomId:currencyUomId,
-                    placedDate:placedDate,grandTotal:grandTotal,customers_deatails:customers_deatails,
-                    order_parts:order_parts]"/>
+            <!-- Set Order details in the orders list and also adding the order_parts list and customers_deatails map -->
+            <set field="orders" from="orders+[orderId:orderId, orderName:orderName, currencyUomId:currencyUomId, salesChannelEnumId:salesChannelEnumId
+                                    , statusId:statusId, placedDate:placedDate, grandTotal:grandTotal, customers_deatails:customers_deatails,
+                                      order_parts:order_parts]"/>
         </actions>
     </service>
 
@@ -371,35 +238,34 @@
     <service verb="get" noun="OrderDetails">
         <out-parameters>
             <parameter name="orders" type="list">
-                <parameter name="orderId" required="false"/>
-                <parameter name="orderName" required="false"/>
-                <parameter name="currencyUomId" required="false"/>
+                <parameter name="orderId" required="true"/>
+                <parameter name="orderName" required="true"/>
+                <parameter name="currencyUomId" required="true"/>
                 <parameter name="placedDate" required="true"/>
-                <parameter name="grandTotal" required="false"/>
+                <parameter name="grandTotal" required="true"/>
                 <parameter name="customers_deatails" type="map">
-                    <parameter name="partyId"/>
-                    <parameter name="firstName"/>
-                    <parameter name="middleName"/>
-                    <parameter name="lastName"/>
+                    <parameter name="partyId" required="true"/>
+                    <parameter name="firstName" required="true"/>
+                    <parameter name="middleName" required="true"/>
+                    <parameter name="lastName" required="true"/>
                 </parameter>
                 <parameter name="order_parts" type="list">
                     <parameter name="orderparts" type="map">
-                        <parameter name="orderPartSeqId"/>
-                        <parameter name="partName"/>
-                        <parameter name="facilityId"/>
-                        <parameter name="shipmentMethodEnumId"/>
-                        <parameter name="partStatusId"/>
-                        <parameter name="partTotal"/>
+                        <parameter name="orderPartSeqId" required="true"/>
+                        <parameter name="partName" required="true"/>
+                        <parameter name="facilityId" required="true"/>
+                        <parameter name="shipmentMethodEnumId" required="true"/>
+                        <parameter name="partStatusId" required="true"/>
+                        <parameter name="partTotal" required="true"/>
                         <parameter name="item_details" type="list">
                             <parameter name="item_map" type="map">
-                                <parameter name="orderItemSeqId"/>
-                                <parameter name="productId"/>
-                                <parameter name="itemDescription"/>
-                                <parameter name="quantity"/>
-                                <parameter name="unitAmount"/>
+                                <parameter name="orderItemSeqId" required="true"/>
+                                <parameter name="productId" required="true"/>
+                                <parameter name="itemDescription" required="true"/>
+                                <parameter name="quantity" required="true"/>
+                                <parameter name="unitAmount" required="true"/>
                             </parameter>
                         </parameter>
-
                     </parameter>
                 </parameter>
             </parameter>
@@ -410,75 +276,62 @@
             <set field="order_parts" from="[]"/>
             <set field="item_details" from="[]"/>
             <set field="persons" from="[]"/>
+            <!-- Getting all Order records of the OrderHeader entity -->
             <entity-find entity-name="mantle.order.OrderHeader" list="orderList">
-                <select-field field-name="orderId"/>
-                <select-field field-name="orderName"/>
-                <select-field field-name="currencyUomId"/>
-                <select-field field-name="placedDate"/>
-                <select-field field-name="grandTotal"/>
+                <select-field field-name="orderId,orderName,currencyUomId,placedDate,grandTotal"/>
             </entity-find>
-            <entity-find entity-name="mantle.order.OrderPart" list="orderPartList">
-                <select-field field-name="orderPartSeqId"/>
-                <select-field field-name="customerPartyId"/>
-                <select-field field-name="partName"/>
-                <select-field field-name="facilityId"/>
-                <select-field field-name="shipmentMethodEnumId"/>
-                <select-field field-name="statusId"/>
-                <select-field field-name="partTotal"/>
-            </entity-find>
-            <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
-                <select-field field-name="orderItemSeqId"/>
-                <select-field field-name="productId"/>
-                <select-field field-name="itemDescription"/>
-                <select-field field-name="quantity"/>
-                <select-field field-name="unitAmount"/>
-            </entity-find>
-            <entity-find entity-name="mantle.party.Person" list="personList">
-                <select-field field-name="partyId"/>
-                <select-field field-name="firstName"/>
-                <select-field field-name="middleName"/>
-                <select-field field-name="lastName"/>
-            </entity-find>
-            <iterate list="orderList" entry="ordersHeadersMap">
-                <set field="orderId" from="ordersHeadersMap.orderId"/>
-                <set field="orderName" from="ordersHeadersMap.orderName"/>
-                <set field="currencyUomId" from="ordersHeadersMap.currencyUomId"/>
-                <set field="placedDate" from="ordersHeadersMap.placedDate"/>
-                <set field="grandTotal" from="ordersHeadersMap.grandTotal"/>
-                <iterate list="personList" entry="person">
-                    <set field="partyId" from="person.partyId"/>
-                    <set field="firstName" from="person.firstName"/>
-                    <set field="middleName" from="person.middleName"/>
-                    <set field="lastName" from="person.lastName"/>
-                    <iterate list="orderPartList" entry="orderPart">
-                        <set field="orderPartSeqId" from="orderPart.orderPartSeqId"/>
-                        <set field="partName" from="orderPart.partName"/>
-                        <set field="facilityId" from="orderPart.facilityId"/>
-                        <set field="shipmentMethodEnumId" from="orderPart.shipmentMethodEnumId"/>
-                        <set field="statusId" from="orderPart.statusId"/>
-                        <set field="partTotal" from="orderPart.partTotal"/>
-
-                        <iterate list="orderItemList" entry="orderItems">
-                            <set field="orderItemSeqId" from="orderItems.orderItemSeqId"/>
-                            <set field="productId" from="orderItems.productId"/>
-                            <set field="itemDescription" from="orderItems.itemDescription"/>
-                            <set field="quantity" from="orderItems.quantity"/>
-                            <set field="unitAmount" from="orderItems.unitAmount"/>
-                        </iterate>
+            <!-- Iterate the orderList for getting order information -->
+            <iterate list="orderList" entry="orderMap">
+                <set field="orderId" from="orderMap.orderId"/>
+                <set field="orderName" from="orderMap.orderName"/>
+                <set field="currencyUomId" from="orderMap.currencyUomId"/>
+                <set field="salesChannelEnumId" from="orderMap.salesChannelEnumId"/>
+                <set field="statusId" from="orderMap.statusId"/>
+                <set field="placedDate" from="orderMap.placedDate"/>
+                <set field="grandTotal" from="orderMap.grandTotal"/>
+                <entity-find entity-name="mantle.order.OrderPart" list="orderPartList">
+                    <econdition field-name="orderId" from="orderMap.orderId"></econdition>
+                    <select-field
+                            field-name="orderId,orderPartSeqId,customerPartyId,partName,facilityId,shipmentMethodEnumId,statusId,partTotal"/>
+                </entity-find>
+                <iterate list="orderPartList" entry="orderPartMap">
+                    <entity-find entity-name="mantle.order.OrderItem" list="orderItemList">
+                        <econdition field-name="orderId" from="orderPartMap.orderId"/>
+                        <econdition field-name="orderPartSeqId" from="orderPartMap.orderPartSeqId"/>
+                        <select-field field-name="orderItemSeqId,productId,itemDescription,quantity,unitAmount"/>
+                    </entity-find>
+                    <iterate list="orderItemList" entry="orderItemMap">
+                        <set field="orderItemSeqId" from="orderItemMap.orderItemSeqId"/>
+                        <set field="productId" from="orderItemMap.productId"/>
+                        <set field="itemDescription" from="orderItemMap.itemDescription"/>
+                        <set field="quantity" from="orderItemMap.quantity"/>
+                        <set field="unitAmount" from="orderItemMap.unitAmount"/>
+                        <!-- Set OrderItems details in the item_details list -->
+                        <set field="item_details" from="item_details+[orderItemSeqId:orderItemSeqId, productId:productId,
+                                    itemDescription:itemDescription, quantity:quantity, unitAmount:unitAmount]"/>
                     </iterate>
+                    <!-- Set OrderPart details in the Order_parts list and also adding the item_details map in the Order_parts list -->
+                    <set field="order_parts" from="order_parts+[orderPartSeqId:orderPartMap.orderPartSeqId, partName:orderPartMap.partName,
+                                facilityId:orderPartMap.facilityId, shipmentMethodEnumId:orderPartMap.shipmentMethodEnumId,
+                                statusId:orderPartMap.statusId, partTotal:orderPartMap.partTotal, item_details:item_details]"/>
                 </iterate>
-                <set field="customers_deatails" from="customers_deatails+[partyId:partyId,firstName:firstName,
-                        middleName:middleName,lastName:lastName]"/>
-                <set field="item_details" from="item_details+[orderItemSeqId:orderItemSeqId,productId:productId,
-                        itemDescription:itemDescription,quantity:quantity,
-                        unitAmount:unitAmount]"/>
-                <set field="order_parts" from="order_parts+[orderPartSeqId:orderPartSeqId,partName:partName,
-                        facilityId:facilityId,shipmentMethodEnumId:shipmentMethodEnumId,
-                        statusId:statusId,partTotal:partTotal,item_details:item_details]"/>
-                <set field="orders" from="orders+[orderId:orderId,orderName:orderName,currencyUomId:currencyUomId,
-                        placedDate:placedDate
-                        ,grandTotal:grandTotal,customers_deatails:customers_deatails,order_parts:order_parts]"/>
+                <entity-find-one entity-name="mantle.party.Person" value-field="personList">
+                    <field-map field-name="partyId" from="orderPartMap.customerPartyId"/>
+                    <select-field field-name="partyId,firstName,middleName,lastName"/>
+                </entity-find-one>
+                <set field="partyId" from="personList.partyId"/>
+                <set field="firstName" from="personList.firstName"/>
+                <set field="middleName" from="personList.middleName"/>
+                <set field="lastName" from="personList.lastName"/>
+                <!-- Adding the person details in the customers_deatails map -->
+                <set field="customers_deatails"
+                     from="customers_deatails+[partyId:partyId, firstName:firstName, middleName:middleName, lastName:lastName]"/>
+                <!-- Set Order details in the orders list and also adding the order_parts list and customers_deatails map -->
+                <set field="orders" from="orders+[orderId:orderId, orderName:orderName, currencyUomId:currencyUomId, salesChannelEnumId:salesChannelEnumId
+                                    , statusId:statusId, placedDate:placedDate, grandTotal:grandTotal, customers_deatails:customers_deatails,
+                                     order_parts:order_parts]"/>
             </iterate>
+
         </actions>
     </service>
 
